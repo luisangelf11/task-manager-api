@@ -1,12 +1,9 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { STATUS_CODES } from 'http';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class TasksService {
@@ -62,6 +59,11 @@ export class TasksService {
       });
       return updateTask;
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError)
+        return new HttpException(
+          `The task with id ${id} is not found`,
+          HttpStatus.NOT_FOUND,
+        );
       if (error instanceof Error)
         return new HttpException(
           `Internal Server Error: ${error.message}`,
@@ -79,6 +81,11 @@ export class TasksService {
       });
       return deletedTask;
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError)
+        return new HttpException(
+          `The task with id ${id} is not found`,
+          HttpStatus.NOT_FOUND,
+        );
       if (error instanceof Error)
         return new HttpException(
           `Internal Server Error: ${error.message}`,
@@ -90,9 +97,13 @@ export class TasksService {
   async findTask(id: number) {
     try {
       const task = await this.prisma.tasks.findFirst({
-        where: { id },});
+        where: { id },
+      });
       if (task) return task;
-      return new HttpException(`Task with id ${id} is not found`, HttpStatus.NOT_FOUND);
+      return new HttpException(
+        `Task with id ${id} is not found`,
+        HttpStatus.NOT_FOUND,
+      );
     } catch (error) {
       if (error instanceof Error)
         return new HttpException(

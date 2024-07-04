@@ -36,7 +36,7 @@ export class AuthController {
   @Post('login')
   @ApiOperation({summary: 'Login with an account'})
   @ApiResponse({status: 200, description: 'User logged-in'})
-  @ApiResponse({status: 501, description: 'Unauthorized'})
+  @ApiResponse({status: 401, description: 'Unauthorized'})
   async login(@Request() req) {
     return this.authService.login(req.user);
   }

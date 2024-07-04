@@ -45,14 +45,16 @@ export class UsersService {
 
   async findProfile(id: number){
     try {
-      console.log(id)
       const profile = await this.prisma.users.findFirst({
         where:{
           id
         }
       })
-      const {password, ...result} = profile;
-      return result;
+      if(profile){
+        const {password, ...result} = profile;
+        return result;
+      }
+      return new HttpException(`Profile is not found`, HttpStatus.NOT_FOUND)
     } catch (error) {
       if(error instanceof Error)
         return new HttpException(`Internal server error: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR)

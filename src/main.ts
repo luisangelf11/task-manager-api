@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger'
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -11,6 +12,15 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
+  //Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Tasks manager')
+    .setDescription('This is a tasks manager API made with nest js')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   //Enabled cors
   app.enableCors();

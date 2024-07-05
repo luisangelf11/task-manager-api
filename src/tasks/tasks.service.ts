@@ -23,7 +23,7 @@ export class TasksService {
       return tasks;
     } catch (error) {
       if (error instanceof Error)
-        return new HttpException(
+        throw new HttpException(
           `Internal Server Error: ${error.message}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
@@ -42,7 +42,7 @@ export class TasksService {
       return newTask;
     } catch (error) {
       if (error instanceof Error)
-        return new HttpException(
+        throw new HttpException(
           `Internal Server Error: ${error.message}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
@@ -64,12 +64,9 @@ export class TasksService {
       return updateTask;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError)
-        return new HttpException(
-          `The task with id ${id} is not found`,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException(`Task with id ${id} is not found`);
       if (error instanceof Error)
-        return new HttpException(
+        throw new HttpException(
           `Internal Server Error: ${error.message}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
@@ -86,9 +83,9 @@ export class TasksService {
       return deletedTask;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError)
-        return new NotFoundException(`Task with id ${id} is not found`);
+        throw new NotFoundException(`Task with id ${id} is not found`);
       if (error instanceof Error)
-        return new HttpException(
+        throw new HttpException(
           `Internal Server Error: ${error.message}`,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
@@ -101,13 +98,10 @@ export class TasksService {
         where: { id },
       });
       if (task) return task;
-      return new NotFoundException(`Task with id ${id} is not found`);
+      throw new Error(`Task with id ${id} is not found`);
     } catch (error) {
       if (error instanceof Error)
-        return new HttpException(
-          `Internal Server Error: ${error.message}`,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+        throw new NotFoundException(error.message );
     }
   }
 }
